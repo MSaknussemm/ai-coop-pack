@@ -1,0 +1,73 @@
+#pragma once
+
+#include "Player.hpp"
+
+extern u8 g_ItemDropTable[32];
+
+typedef enum ItemType
+{
+    ITEM_POWER_SMALL = 0,
+    ITEM_POINT = 1,
+    ITEM_POWER_BIG = 2,
+    ITEM_BOMB = 3,
+    ITEM_FULL_POWER = 4,
+    ITEM_LIFE = 5,
+    ITEM_POINT_BULLET = 6,
+    ITEM_CHERRY = 7,
+    ITEM_CHERRY_SMALL = 8,
+    ITEM_STAR = 9,
+    ITEM_NO_ITEM = 255
+} ItemType;
+
+struct Item
+{
+    i32 IsBelowPoc()
+    {
+        return this->currentPosition.y < g_Players[this->collector].shooterData->pocY;
+    }
+
+    i32 OffsetFromPoc()
+    {
+        return this->currentPosition.y - g_Players[this->collector].shooterData->pocY;
+    }
+
+    i32 ShouldAwardMaxScore()
+    {
+        return this->currentPosition.y < g_Players[this->collector].shooterData->pocY ||
+               this->autoCollect;
+    }
+
+    AnmVm sprite;
+    Float3 currentPosition;
+    Float3 startPosition;
+    Float3 targetPosition;
+    ZunTimer timer;
+    i8 itemType;
+    i8 isInUse;
+    i8 isOnscreen;
+    i8 state;
+    i8 autoCollect;
+    i8 collector;
+    i8 targetSeat; // -1: unclaimed
+    i8 transfer;
+    struct Item *next;
+};
+C_ASSERT(sizeof(Item) == 0x288);
+
+struct ItemManager
+{
+    void ActivateAllItems();
+    void DespawnAllItems(i32 param_1);
+    void OnUpdate();
+    void OnDraw();
+    void RemoveAllItems();
+    Item *SpawnItem(Float3 *heading, i32 itemType, i32 state, i32 recipient = -1);
+    bool SpawnTransfer(Float3 *heading, i32 itemType, i32 recipient, i32 amount = 1);
+
+    struct Item items[1101];
+    i32 nextIndex;
+    i32 activeItemCount;
+    struct Item listHead;
+    struct Item *listTail;
+};
+extern ItemManager &g_ItemManager;

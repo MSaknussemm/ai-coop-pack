@@ -1,0 +1,134 @@
+#pragma once
+
+#include "AnmManager.hpp"
+#include "Chain.hpp"
+#include "ReplayManager.hpp"
+#include "Supervisor.hpp"
+
+typedef enum GameState
+{
+    STATE_PRE_INPUT = 0,
+    STATE_OPTIONS = 2,
+    STATE_KEY_CONFIG = 3,
+    STATE_NORMAL_SELECT_DIFFICULTY = 4,
+    STATE_NORMAL_SELECT_CHARACTER = 5,
+    STATE_NORMAL_SELECT_SHOTTYPE = 6,
+    STATE_SELECT_REPLAY = 7,
+    STATE_PRACTICE_SELECT_DIFFICULTY = 8,
+    STATE_PRACTICE_SELECT_CHARACTER = 9,
+    STATE_PRACTICE_SELECT_SHOTTYPE = 10,
+    STATE_SELECT_PRACTICE_STAGE = 11,
+    STATE_EXTRA_SELECT_DIFFICULTY = 12,
+    STATE_EXTRA_SELECT_CHARACTER = 13,
+    STATE_EXTRA_SELECT_SHOTTYPE = 14
+} GameState;
+
+struct MainMenu
+{
+    MainMenu()
+    {
+        memset(this, 0, sizeof(MainMenu));
+    }
+
+    static ZunResult RegisterChain(u32 param_1);
+
+    static ZunResult AddedCallback(MainMenu *arg);
+    static ZunResult DeletedCallback(MainMenu *arg);
+    static u32 OnUpdate(MainMenu *arg);
+    static u32 OnDraw(MainMenu *arg);
+
+    u32 OnUpdatePreInput();
+    u32 OnUpdateOptionsMenu();
+    u32 OnUpdateKeyConfig();
+
+    u32 OnUpdateSelectDifficulty();
+    u32 OnUpdateSelectCharacter();
+    u32 OnUpdateSelectShotType();
+    i32 IsCoopLoadoutSelection() const;
+    u8 &SelectedCharacter();
+    u8 &SelectedShotType();
+    void DrawCoopSelectLabels();
+
+    u32 OnUpdateSelectReplay();
+    u32 OnUpdateSelectPracticeStage();
+
+    i32 DrawReplayMenu();
+    i32 DrawPracticeMenu();
+
+    ZunResult ActualAddedCallback();
+    i32 MoveCursorHorizontal(i32 max);
+    i32 MoveCursorVertical(i32 max);
+    ZunResult Release();
+    void SwapMapping(i16 btnPressed, i16 oldMapping, i16 idk);
+    ZunResult UpdateMenuDigits(AnmVm *param_1, i16 param_2);
+
+    // FUNCTION: TH07 0x004553fa
+    static void InitializeTimingVars(Supervisor *arg)
+    {
+        arg->timingErrorCount = 0;
+        arg->maxTimingError = 0;
+        arg->checkTiming = 0;
+        arg->timingSpikeAccumulator = 0;
+        arg->timingBadCount = 0;
+    }
+
+    // FUNCTION: TH07 0x00455435
+    void SetGameState(GameState gameState)
+    {
+        this->prevGameState = this->gameState;
+        this->gameState = gameState;
+        this->inputDelayTimer = 0;
+        this->stateTimer = 0;
+        this->menuSubState = 0;
+        this->idleFrames = 0;
+    }
+
+    i32 IsSelected(i32 idx)
+    {
+        i32 selected = idx == this->cursor;
+        return selected;
+    }
+
+    i32 IsReplaySelected(i32 idx)
+    {
+        i32 selected = idx == this->chosenReplay;
+        return selected;
+    }
+
+    i32 IsStageSelected(i32 idx)
+    {
+        i32 selected = idx == this->selectedStage;
+        return selected;
+    }
+
+    i32 cursor;
+    i32 selected;
+    i32 menuSubState;
+    i32 inputDelayTimer;
+    i32 unused_10[21];
+    i32 prevGameState;
+    i32 isPracticeMode;
+    char replayFilenames[60][512];
+    char replayLabels[60][8];
+    ReplayFile replays[60];
+    ReplayFile *currentReplay;
+    i32 replayPage;
+    i32 replayFilesNum;
+    i32 chosenReplay;
+    i32 selectedStage;
+    i32 idleFrames;
+    AnmVm *vmHead;
+    AnmVm *cursorVm;
+    AnmVm vms[14];
+    i32 vmCount;
+    i32 gameState;
+    i32 stateTimer;
+    i32 demoFramesCount;
+    ChainElem *calcChain;
+    ChainElem *drawChain;
+    ControllerMapping controlMapping;
+    // pad 2
+    GameConfiguration cfg;
+    i32 coopSelectionSeat;
+};
+C_ASSERT(sizeof(MainMenu) == 0xd15c);

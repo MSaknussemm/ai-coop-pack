@@ -1,0 +1,27 @@
+# 游戏本体数据 —— 绝对不提交
+*.dat
+th07.exe
+thbgm*
+!*.patch
+
+# 编译工具链与中间产物
+thirdparty/
+prefix/
+build/obj/
+*.pdb
+*.map
+*.obj
+
+# 日志、回放、截图
+*.log
+*_log.txt
+trace.txt
+build/replay/
+build/*.png
+
+# 压缩包
+*.zip
+
+# Python / 编译缓存
+__pycache__/
+*.pyc
