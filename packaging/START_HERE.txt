@@ -47,7 +47,7 @@ Life transfer / revival:
 
 Boss health:
   Final damage to a boss scales with the number of players: unchanged for one,
-  0.75x for two, 2/3 for three.
+  0.60x for two, 0.75x for three, and 0.50x for four.
 
 Useful test options (run th07_multi_net.exe from a terminal):
   --test-random-input  local ship only: deterministic move/shot/bomb test

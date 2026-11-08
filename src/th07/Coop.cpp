@@ -166,7 +166,7 @@ i32 CoopScaleDamage(Enemy *enemy, i32 damage)
     i32 boss = enemy->isBoss != 0;
     // By seats (2..4), boss / other
     static const i32 percent[3][2] = {
-        {100, 100},
+        {60, 60},
         {75, 75},
         {66, 50},
     };
